@@ -12,4 +12,4 @@ export default defineSchema({
     userId: v.id("users"),
     isCompleted: v.boolean(), // ✅ REQUIRED
   }),
-});
+}); 
