@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,8 +9,22 @@ import {
 } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Id } from "../convex/_generated/dataModel";
 
-export default function LoginScreen() {
+type Props = {
+  onLogin: (id: Id<"users">) => void;
+};
+
+export default function LoginScreen({ onLogin }: Props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    // TEMP MOCK LOGIN (replace with Convex later)
+    const fakeUserId = "123" as Id<"users">;
+    onLogin(fakeUserId);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -22,16 +37,27 @@ export default function LoginScreen() {
 
       <View style={styles.formContainer}>
         <Text style={styles.label}>Email Address</Text>
-        <TextInput style={styles.input} placeholder="john@gmail.com" />
+        <TextInput
+          style={styles.input}
+          placeholder="john@gmail.com"
+          value={email}
+          onChangeText={setEmail}
+        />
 
         <Text style={styles.label}>Password</Text>
-        <TextInput style={styles.input} secureTextEntry placeholder="********" />
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          placeholder="********"
+          value={password}
+          onChangeText={setPassword}
+        />
 
         <TouchableOpacity>
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
 
