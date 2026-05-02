@@ -1,9 +1,11 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// GET todos
+// GET TODOS
 export const get = query({
-  args: { userId: v.id("users") },
+  args: {
+    userId: v.id("users"),
+  },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("todos")
@@ -12,7 +14,7 @@ export const get = query({
   },
 });
 
-// ADD todo
+// ADD TODO
 export const add = mutation({
   args: {
     text: v.string(),
@@ -21,31 +23,30 @@ export const add = mutation({
   handler: async (ctx, args) => {
     await ctx.db.insert("todos", {
       text: args.text,
-      isCompleted: false,
       userId: args.userId,
+      isCompleted: false, // ✅ default value
     });
   },
 });
 
-// TOGGLE todo
+// TOGGLE TODO (FIX FOR YOUR ERROR)
 export const toggle = mutation({
   args: {
     id: v.id("todos"),
+    isCompleted: v.boolean(), // ✅ IMPORTANT FIX
   },
   handler: async (ctx, args) => {
-    const todo = await ctx.db.get(args.id);
-
-    if (!todo) throw new Error("Todo not found");
-
     await ctx.db.patch(args.id, {
-      isCompleted: !todo.isCompleted,
+      isCompleted: args.isCompleted,
     });
   },
 });
 
-// DELETE todo
+// DELETE TODO
 export const remove = mutation({
-  args: { id: v.id("todos") },
+  args: {
+    id: v.id("todos"),
+  },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
   },

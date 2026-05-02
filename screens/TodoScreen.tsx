@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Ionicons from "@react-native-vector-icons/ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import {
     Alert,
     KeyboardAvoidingView,
@@ -9,39 +9,43 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 
-const TodoScreen = ({ userId }: {userId: Id<"users">}) => {
-    const [task, setTask] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
+const TodoScreen = ({ userId }: { userId: Id<"users"> }) => {
+    const [task, setTask] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const todoList = useQuery(api.todos.get, { userId });
+    const todoList = useQuery(api.todos.get, { userId }) ?? [];
+
     const addTodo = useMutation(api.todos.add);
     const toggleTodoMutation = useMutation(api.todos.toggle);
     const deleteTodoMutation = useMutation(api.todos.remove);
 
-    if (todoList === undefined) {
-        return <Text>Loading tasks...</Text>;
-    }
-
-    const filterTodos = todoList.filter(item =>
-        item.text.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase())
+    const filterTodos = todoList.filter((item) =>
+        item.text.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
 
     const handleAddTodo = async () => {
         if (task.trim().length === 0) return;
-        await addTodo({ text: task, userId: userId });
-        setTask('');
+
+        await addTodo({
+            text: task,
+            userId,
+        });
+
+        setTask("");
     };
 
     const toggleTodo = (id: Id<"todos">, currentStatus: boolean) => {
-        toggleTodoMutation({ id, isCompleted: !currentStatus });
+        toggleTodoMutation({
+            id,
+            isCompleted: !currentStatus,
+        });
     };
 
     const confirmDelete = (id: Id<"todos">) => {
@@ -50,16 +54,17 @@ const TodoScreen = ({ userId }: {userId: Id<"users">}) => {
             {
                 text: "Delete",
                 style: "destructive",
-                onPress: () => deleteTodoMutation({ id })
+                onPress: () => deleteTodoMutation({ id }),
             },
         ]);
     };
 
     return (
         <View style={styles.container}>
-            {/* 1. Header Section (Purple) */}
+            {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.title}>My Tasks</Text>
+
                 <View style={styles.searchContainer}>
                     <Ionicons name="search-outline" size={20} color="#666" />
                     <TextInput
@@ -71,56 +76,99 @@ const TodoScreen = ({ userId }: {userId: Id<"users">}) => {
                 </View>
             </View>
 
-            {/* 2. Body Section (White with Rounded Top) */}
+            {/* Body */}
             <View style={styles.bodyContainer}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {filterTodos.map(item => (
-                        <View style={styles.todoItem} key={item._id}>
-                            <TouchableOpacity style={styles.textWrapper} onPress={() => toggleTodo(item._id, item.isCompleted)}>
-                                <Ionicons
-                                    name={item.isCompleted ? "checkmark-circle" : "ellipse-outline"}
-                                    size={28}
-                                    color={item.isCompleted ? "#7D7AFF" : "#CCC"}
+                {todoList === undefined ? (
+                    <Text>Loading tasks...</Text>
+                ) : (
+                    <>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {filterTodos.map((item) => (
+                                <View style={styles.todoItem} key={item._id}>
+                                    <TouchableOpacity
+                                        style={styles.textWrapper}
+                                        onPress={() =>
+                                            toggleTodo(item._id, item.isCompleted)
+                                        }
+                                    >
+                                        <Ionicons
+                                            name={
+                                                item.isCompleted
+                                                    ? "checkmark-circle"
+                                                    : "ellipse-outline"
+                                            }
+                                            size={28}
+                                            color={
+                                                item.isCompleted
+                                                    ? "#7D7AFF"
+                                                    : "#CCC"
+                                            }
+                                        />
+
+                                        <Text
+                                            style={[
+                                                styles.todoText,
+                                                item.isCompleted &&
+                                                    styles.todoCompleted,
+                                            ]}
+                                        >
+                                            {item.text}
+                                        </Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={() => confirmDelete(item._id)}
+                                    >
+                                        <Ionicons
+                                            name="trash-outline"
+                                            size={24}
+                                            color="#FF5252"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                        </ScrollView>
+
+                        {/* Input */}
+                        <KeyboardAvoidingView
+                            behavior={
+                                Platform.OS === "ios" ? "padding" : "height"
+                            }
+                            keyboardVerticalOffset={
+                                Platform.OS === "ios" ? 100 : 0
+                            }
+                        >
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    placeholder="Add a new task"
+                                    style={styles.input}
+                                    value={task}
+                                    onChangeText={setTask}
                                 />
-                                <Text style={[styles.todoText, item.isCompleted && styles.todoCompleted]}>
-                                    {item.text}
-                                </Text>
-                            </TouchableOpacity>
 
-
-                            <TouchableOpacity onPress={() => confirmDelete(item._id)}>
-                                <Ionicons name="trash-outline" size={24} color="#FF5252" />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
-                </ScrollView>
-
-                {/* 3. Input Section */}
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-                >
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            placeholder="Add a new task"
-                            style={styles.input}
-                            value={task}
-                            onChangeText={setTask}
-                        />
-                        <TouchableOpacity style={styles.addButton} onPress={handleAddTodo}>
-                            <Ionicons name="add" size={32} color="black" />
-                        </TouchableOpacity>
-                    </View>
-                </KeyboardAvoidingView>
+                                <TouchableOpacity
+                                    style={styles.addButton}
+                                    onPress={handleAddTodo}
+                                >
+                                    <Ionicons
+                                        name="add"
+                                        size={32}
+                                        color="black"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </KeyboardAvoidingView>
+                    </>
+                )}
             </View>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#7D7AFF", // Consistent Purple theme
+        backgroundColor: "#7D7AFF",
     },
     header: {
         paddingTop: 70,
@@ -134,9 +182,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     searchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#FFF",
         borderRadius: 15,
         paddingHorizontal: 15,
     },
@@ -145,12 +193,10 @@ const styles = StyleSheet.create({
         height: 50,
         marginLeft: 10,
     },
-
-
     bodyContainer: {
         flex: 1,
         backgroundColor: "#FFF",
-        borderTopLeftRadius: 50, // Consistent with Login screen
+        borderTopLeftRadius: 50,
         borderTopRightRadius: 50,
         paddingHorizontal: 30,
         paddingTop: 40,
@@ -159,11 +205,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#FFF",
         padding: 15,
         borderRadius: 20,
         marginBottom: 15,
-        borderWidth: 1,         // Using border instead of shadow
+        borderWidth: 1,
         borderColor: "#F0F0F0",
     },
     textWrapper: {
@@ -176,7 +221,6 @@ const styles = StyleSheet.create({
         color: "#333",
         marginLeft: 12,
     },
-
     todoCompleted: {
         textDecorationLine: "line-through",
         color: "#AAA",
@@ -190,12 +234,12 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         height: 55,
-        backgroundColor: "#F5F5F5", // Light gray inputs
+        backgroundColor: "#F5F5F5",
         borderRadius: 15,
         paddingHorizontal: 20,
     },
     addButton: {
-        backgroundColor: "#FFCC00", // Golden Yellow accent
+        backgroundColor: "#FFCC00",
         borderRadius: 15,
         width: 55,
         height: 55,

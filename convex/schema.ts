@@ -9,7 +9,7 @@ export default defineSchema({
 
   todos: defineTable({
     text: v.string(),
-    isCompleted: v.boolean(),
     userId: v.id("users"),
+    isCompleted: v.boolean(), // ✅ REQUIRED
   }),
 });

@@ -8,8 +8,7 @@ import {
     TextInput,
     Alert,
 } from "react-native";
-import Ionicons from "@react-native-vector-icons/ionicons";
-
+import {Ionicons} from "@expo/vector-icons";
 import { useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
