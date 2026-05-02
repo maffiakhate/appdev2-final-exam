@@ -1,59 +1,103 @@
-import { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  TextInput,
 } from "react-native";
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
 
-const SignupScreen = () => {
-  const [fullname, setFullname] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-  const register = useMutation(api.users.register);
-
-  const handleSignup = async () => {
-    if (!fullname || !username || !password) {
-      Alert.alert("Error", "Fill all fields");
-      return;
-    }
-
-    await register({ fullname, username, password });
-    Alert.alert("Success", "Account created!");
-  };
-
+export default function SignupScreen() {
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Full Name" style={styles.input} value={fullname} onChangeText={setFullname} />
-      <TextInput placeholder="Username" style={styles.input} value={username} onChangeText={setUsername} />
-      <TextInput placeholder="Password" secureTextEntry style={styles.input} value={password} onChangeText={setPassword} />
+      <View style={styles.header}>
+        <Image
+          source={require("./../../assets/signup.webp")}
+          style={styles.illustration}
+          resizeMode="contain"
+        />
+      </View>
 
-      <TouchableOpacity style={styles.btn} onPress={handleSignup}>
-        <Text style={styles.btnText}>Sign Up</Text>
-      </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput style={styles.input} placeholder="John Doe" />
+
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput style={styles.input} placeholder="john@gmail.com" />
+
+        <Text style={styles.label}>Password</Text>
+        <TextInput style={styles.input} secureTextEntry placeholder="********" />
+
+        <TouchableOpacity style={styles.loginButton}>
+          <Text style={styles.loginButtonText}>Sign Up</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.orText}>Or</Text>
+
+        <View style={styles.socialRow}>
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-google" size={28} color="#DB4437" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-apple" size={28} color="black" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-facebook" size={28} color="#4267B2" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text>Already have an account? </Text>
+          <TouchableOpacity>
+            <Text style={styles.linkText}>Log In</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
-};
-
-export default SignupScreen;
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  input: {
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 10,
+  container: { flex: 1, backgroundColor: "#7D7AFF", paddingTop: 40 },
+  header: { flex: 1, justifyContent: "center", alignItems: "center" },
+  illustration: { width: "80%", height: "70%" },
+
+  formContainer: {
+    flex: 2,
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+    padding: 30,
   },
-  btn: {
+
+  label: { fontSize: 14, color: "#666", marginTop: 15 },
+  input: { backgroundColor: "#F0F0F0", padding: 15, borderRadius: 15, marginTop: 5 },
+
+  loginButton: {
     backgroundColor: "#FFCC00",
-    padding: 15,
-    borderRadius: 10,
+    padding: 18,
+    borderRadius: 15,
+    alignItems: "center",
+    marginTop: 30,
   },
-  btnText: { textAlign: "center", fontWeight: "bold" },
+
+  loginButtonText: { fontWeight: "bold", fontSize: 18 },
+
+  orText: { textAlign: "center", marginVertical: 20, fontWeight: "bold" },
+
+  socialRow: { flexDirection: "row", justifyContent: "center", gap: 20 },
+
+  socialIcon: {
+    backgroundColor: "#F0F0F0",
+    padding: 15,
+    borderRadius: 15,
+  },
+
+  footer: { flexDirection: "row", justifyContent: "center", marginTop: 30 },
+
+  linkText: { color: "#FFCC00", fontWeight: "bold" },
 });

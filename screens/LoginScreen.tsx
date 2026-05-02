@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,96 +5,102 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from "react-native";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
 
-interface LoginProps {
-  onLogin: (id: Id<"users">) => void;
-}
-
-const LoginScreen = ({ onLogin }: LoginProps) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const loginMutation = useMutation(api.users.login);
-
-  const handleLogin = async () => {
-    if (!username || !password) {
-      Alert.alert("Error", "Fill all fields!");
-      return;
-    }
-
-    try {
-      const result = await loginMutation({ username, password });
-
-      if (result.success && result.userId) {
-        onLogin(result.userId);
-      } else {
-        Alert.alert("Login Failed", result.message);
-      }
-    } catch (e) {
-      Alert.alert("Error", "Something went wrong");
-    }
-  };
-
+export default function LoginScreen() {
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/login.webp")} style={styles.img} />
+      <View style={styles.header}>
+        <Image
+          source={require("./../../assets/login.webp")}
+          style={styles.illustration}
+          resizeMode="contain"
+        />
+      </View>
 
-      <TextInput
-        placeholder="Username"
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-      />
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput style={styles.input} placeholder="john@gmail.com" />
 
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Text style={styles.label}>Password</Text>
+        <TextInput style={styles.input} secureTextEntry placeholder="********" />
 
-      <TouchableOpacity style={styles.btn} onPress={handleLogin}>
-        <Text style={styles.btnText}>Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.forgotText}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-      <View style={styles.social}>
-        <Ionicons name="logo-google" size={30} />
-        <Ionicons name="logo-facebook" size={30} />
-        <Ionicons name="logo-apple" size={30} />
+        <TouchableOpacity style={styles.loginButton}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.orText}>Or</Text>
+
+        <View style={styles.socialRow}>
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-google" size={28} color="#DB4437" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-apple" size={28} color="black" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialIcon}>
+            <Ionicons name="logo-facebook" size={28} color="#4267B2" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text>Don't have an account? </Text>
+          <TouchableOpacity>
+            <Text style={styles.linkText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
-};
-
-export default LoginScreen;
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
-  img: { width: "100%", height: 200, marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 10,
+  container: { flex: 1, backgroundColor: "#7D7AFF", paddingTop: 40 },
+  header: { flex: 1, justifyContent: "center", alignItems: "center" },
+  illustration: { width: "80%", height: "70%" },
+
+  formContainer: {
+    flex: 2,
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+    padding: 30,
   },
-  btn: {
-    backgroundColor: "#7D7AFF",
+
+  label: { fontSize: 14, color: "#666", marginTop: 15 },
+  input: { backgroundColor: "#F0F0F0", padding: 15, borderRadius: 15, marginTop: 5 },
+
+  forgotText: { textAlign: "right", marginTop: 10, color: "#666" },
+
+  loginButton: {
+    backgroundColor: "#FFCC00",
+    padding: 18,
+    borderRadius: 15,
+    alignItems: "center",
+    marginTop: 30,
+  },
+
+  loginButtonText: { fontWeight: "bold", fontSize: 18 },
+
+  orText: { textAlign: "center", marginVertical: 20, fontWeight: "bold" },
+
+  socialRow: { flexDirection: "row", justifyContent: "center", gap: 20 },
+
+  socialIcon: {
+    backgroundColor: "#F0F0F0",
     padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
+    borderRadius: 15,
   },
-  btnText: { color: "#fff", textAlign: "center" },
-  social: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
+
+  footer: { flexDirection: "row", justifyContent: "center", marginTop: 30 },
+
+  linkText: { color: "#FFCC00", fontWeight: "bold" },
 });
