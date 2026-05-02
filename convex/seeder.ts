@@ -3,14 +3,13 @@ import { mutation } from "./_generated/server";
 export const seed = mutation({
   args: {},
   handler: async (ctx) => {
-    // 1. Create valid user (FIXED)
     const userId = await ctx.db.insert("users", {
+      fullname: "Seed User",
       username: "seeduser",
-      password: "seedpass", // simple seed password (no bcrypt needed for seeder)
+      password: "seedpass",
     });
 
-    // 2. Tasks
-    const initialTasks = [
+    const tasks = [
       "Buy groceries",
       "Finish React Native tutorial",
       "Clean the kitchen",
@@ -23,15 +22,14 @@ export const seed = mutation({
       "Meditate for 5 minutes",
     ];
 
-    // 3. Insert todos
-    for (const taskText of initialTasks) {
+    for (const text of tasks) {
       await ctx.db.insert("todos", {
-        text: taskText,
-        isCompleted: Math.random() > 0.7,
+        text,
         userId,
+        isCompleted: false,
       });
     }
 
-    return "Successfully seeded 10 tasks with user linkage!";
+    return "Seed completed successfully!";
   },
 });

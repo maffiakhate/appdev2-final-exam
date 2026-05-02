@@ -24,16 +24,16 @@ export const add = mutation({
     await ctx.db.insert("todos", {
       text: args.text,
       userId: args.userId,
-      isCompleted: false, // ✅ default value
+      isCompleted: false,
     });
   },
 });
 
-// TOGGLE TODO (FIX FOR YOUR ERROR)
+// TOGGLE TODO
 export const toggle = mutation({
   args: {
     id: v.id("todos"),
-    isCompleted: v.boolean(), // ✅ IMPORTANT FIX
+    isCompleted: v.boolean(),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.id, {
